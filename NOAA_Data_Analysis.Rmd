@@ -1,0 +1,46 @@
+---
+title: "NOAA Storm Database - Analysis of event effects"
+Synopsis: "max of 10 sentences describing the analysis"
+author: "Stefan Buchholz"
+date: "Thursday, November 06, 2014"
+output: html_document
+---
+
+## Data Processing
+
+### Loading Data
+Firstly the Data is downloaded from the Coursera link
+```{r downloading}
+url <- 'https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2'
+
+if (file.exists('Storm.Data.csv.bz2') == FALSE) {
+    download.file(url, dest='Storm.Data.csv.bz2') }
+```
+
+after we downloaded the data we extract the data and read it into a dataframe:
+
+```{r extracting and reading cache=TRUE}
+library(R.utils)
+bunzip2('Storm.Data.csv.bz2', dest='Storm.Data.csv')
+bz <- read.csv('Storm.Data.csv')
+```
+
+The columns we need to answer our questions are EVTYPE, FATALITIES, INJURIES,
+PROPDMG, CROPDMG.
+```{r shrink}
+needed <- bz[,c(8,23,24,25,27)]
+```
+
+there are no NA values and everything is heavily left skewed.
+
+## Analysis
+
+Required at least one plot
+No more than three plots
+
+Questions to answer:
+1. Across the United States, which types of events (as indicated in the EVTYPE variable) are most harmful with respect to population health?
+
+2. Across the United States, which types of events have the greatest economic consequences?
+
+## Results
