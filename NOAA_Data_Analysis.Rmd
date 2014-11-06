@@ -32,6 +32,12 @@ needed <- bz[,c(8,23,24,25,27)]
 ```
 
 there are no NA values and everything is heavily left skewed.
+When we explore the given Storm reasons we can see that we have to clear them up and 
+make them more conform by:
+
+1. strip blank values
+2. transform them to lower case
+3. delete all special characters
 
 ## Analysis
 
