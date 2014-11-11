@@ -1,15 +1,16 @@
 ---
 title: "NOAA Storm Database - Analysis of event effects"
-Synopsis: "max of 10 sentences describing the analysis"
 author: "Stefan Buchholz"
 date: "Thursday, November 06, 2014"
 output: html_document
 ---
+## Synopsis
+The aim of this analysis is to see which type of wheather events are most harmful to humans and which events are most harmful in terms of economical damage. We extracted the relevant data of the NOAA storm dataset to answer the given questions. Our analysis will show that by far tornados are the most dangerous type of wheather event in any case either for economy or humanity.
 
 ## Data Processing
 
 ### Loading Data
-Firstly the Data is downloaded from the Coursera link
+Firstly the Data is downloaded from the Coursera link.
 ```{r downloading}
 url <- 'https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2'
 
@@ -19,9 +20,12 @@ if (file.exists('Storm.Data.csv.bz2') == FALSE) {
 
 after we downloaded the data we extract the data and read it into a dataframe:
 
-```{r extracting and reading cache=TRUE}
+```{r extracting_and_reading}
 library(R.utils)
-bunzip2('Storm.Data.csv.bz2', dest='Storm.Data.csv')
+
+#if file isnt already unzipped unzip it!
+if (file.exists('Storm.Data.csv') == FALSE) {
+    bunzip2('Storm.Data.csv.bz2', dest='Storm.Data.csv') }
 bz <- read.csv('Storm.Data.csv')
 ```
 
@@ -29,9 +33,9 @@ The columns we need to answer our questions are EVTYPE, FATALITIES, INJURIES,
 PROPDMG, CROPDMG.
 ```{r shrink}
 needed <- bz[,c(8,23,24,25,27)]
+table(needed$EVTYPE)
 ```
 
-there are no NA values and everything is heavily left skewed.
 When we explore the given Storm reasons we can see that we have to clear them up and 
 make them more conform by:
 
@@ -41,7 +45,9 @@ make them more conform by:
 4. strip blank values
 5. set new levels
 
-```{r}
+The reason for that is, that a lot of differnt characters are inside the type of event labels.
+
+```{r clean_dataset}
 #delete everything that looks like a summary line
 filter <- grep("summar",needed$EVTYPE, ignore.case = TRUE)
 needed <- needed[-filter,]
@@ -50,7 +56,7 @@ needed <- needed[-filter,]
 needed$EVTYPE <- tolower(needed$EVTYPE)
 
 #replace few bad chars
-chars <- c("/", "\\", "(", "\)" ,"&")
+chars <- c("/", "\\", "(", ")" ,"&")
 for(i in 1:length(chars)) {
     needed$EVTYPE <- gsub(chars[i], " ", needed$EVTYPE, fixed=TRUE)
 }
@@ -65,11 +71,11 @@ table(needed$EVTYPE)
 
 ## Analysis
 
-Required at least one plot
-No more than three plots
+There are two questions to answer:
 
-Questions to answer:
 1. Across the United States, which types of events (as indicated in the EVTYPE variable) are most harmful with respect to population health?
+
+To answer this question, we have to group the data by type of event and calculate the sum of the effects to humans which are fatalities and injuries.
 
 ```{r question_1}
 needed$health <- needed$FATALITIES + needed$INJURIES
@@ -82,7 +88,7 @@ event_group_health <- summarise(event_group,
 answer1 <- arrange(event_group_health, desc(health))
 ```
 
-Now we can plot our answer 1 ... only the first 10 most harmful events will be printed.
+Now we can plot our answer 1. Only the first 10 most harmful events will be printed.
 
 ```{r print_question1}
 answer1_short <- head(answer1, 10)
@@ -96,9 +102,11 @@ ggplot(data=answer1_short, aes(x = EVTYPE, y = health)) +
     theme(plot.title = element_text(lineheight=.8, face="bold"))
 ```
 
-
+The second question is as follows:
 
 2. Across the United States, which types of events have the greatest economic consequences?
+
+To answer this question we firstly have to group the dataset by type of event. After this we calculate the sum of the economic consequences containing different financial damages as PROPDMG and CROPDMG.
 
 ```{r question_2}
 needed$economic <- needed$PROPDMG + needed$CROPDMG
@@ -111,7 +119,7 @@ event_group_economic <- summarise(event_group,
 answer2 <- arrange(event_group_economic, desc(economic))
 ```
 
-now we can plot our answer 1 ... only the first 10 most harmful events will be printed
+Now we can plot our answer 1. Only the first 10 most harmful events will be printed.
 
 ```{r print_question2}
 answer2_short <- head(answer2, 10)
@@ -128,4 +136,3 @@ ggplot(data=answer2_short, aes(x = EVTYPE, y = economic)) +
 ## Results
 
 As you can see the most harmful wheather event for both, the economy and humanity are tornados. After that the events that make up the most damage in any category are pretty diversified.
-
